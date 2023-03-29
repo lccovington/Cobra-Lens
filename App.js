@@ -1,11 +1,38 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import React, { useEffect, useState, useRef } from "react";
+import { StyleSheet, View } from "react-native";
+import { Camera, CameraType } from "expo-camera";
+import Button from "./components/Buttons";
 
 export default function App() {
+  const [permission, setPermission] = useState(null);
+  const [image, setImage] = useState(null);
+  const [type, setType] = useState(CameraType.back);
+  const cameraRef = useRef(null);
+
+  useEffect(() => {
+    (async () => {
+      const cameraStatus = await Camera.requestCameraPermissionsAsync();
+      setPermission(cameraStatus.status === "granted");
+    })();
+  }, []);
+
+  const takePhoto = async () => {
+    if (cameraRef) {
+      try {
+        const data = await cameraRef.current.takePictureAsync(null);
+        setImage(data.uri);
+      } catch (error) {
+        console.log(error);
+      }
+    }
+  };
+
   return (
     <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
+      <Camera style={styles.camera} type={type} ref={cameraRef}></Camera>
+      <View>
+        <Button title={"Capture Building"} icon="camera" onPress={takePhoto} />
+      </View>
     </View>
   );
 }
@@ -13,8 +40,12 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
+    backgroundColor: "#000",
+    justifyContent: "center",
+    paddingBottom: 20,
+  },
+  camera: {
+    flex: 1,
+    borderRadius: 20,
   },
 });
