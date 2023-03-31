@@ -1,5 +1,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import { StyleSheet, View } from "react-native";
+import * as tf from "@tensorflow/tfjs";
+import "./platform_react_native";
 import { Camera, CameraType } from "expo-camera";
 import Button from "./components/Buttons";
 
@@ -21,6 +23,11 @@ export default function App() {
       try {
         const data = await cameraRef.current.takePictureAsync(null);
         setImage(data.uri);
+        await tf.ready();
+        const model = await tf.loadLayersModel(
+          "https://storage.googleapis.com/tm-model/beHhU_1vW/model.json"
+        );
+        console.log(model.summary());
       } catch (error) {
         console.log(error);
       }
