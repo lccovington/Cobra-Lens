@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
 import { StyleSheet, View } from "react-native";
-import * as tf from "@tensorflow/tfjs";
+import * as tf from '@tensorflow/tfjs';
 import "./platform_react_native";
 import { Camera, CameraType } from "expo-camera";
 import Button from "./components/Buttons";
@@ -18,16 +18,22 @@ export default function App() {
     })();
   }, []);
 
+  const classifyImage = async (model, image) => {
+    console.log(model.summary())
+    console.log("Image:", image)
+  }
+
   const takePhoto = async () => {
     if (cameraRef) {
       try {
-        const data = await cameraRef.current.takePictureAsync(null);
+        const data = await cameraRef.current.takePictureAsync({ base64: true });
         setImage(data.uri);
         await tf.ready();
         const model = await tf.loadLayersModel(
-          "https://storage.googleapis.com/tm-model/beHhU_1vW/model.json"
+          'https://storage.googleapis.com/tm-model/beHhU_1vW/model.json'
         );
-        console.log(model.summary());
+
+        await classifyImage(model, image);
       } catch (error) {
         console.log(error);
       }
